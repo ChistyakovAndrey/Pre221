@@ -1,7 +1,9 @@
 package hiber;
 
 import hiber.config.AppConfig;
+import hiber.model.Car;
 import hiber.model.User;
+import hiber.service.CarService;
 import hiber.service.UserService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -9,26 +11,66 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class MainApp {
-   public static void main(String[] args) throws SQLException {
-      AnnotationConfigApplicationContext context = 
-            new AnnotationConfigApplicationContext(AppConfig.class);
+    public static void main(String[] args) throws SQLException {
+        AnnotationConfigApplicationContext context =
+                new AnnotationConfigApplicationContext(AppConfig.class);
 
-      UserService userService = context.getBean(UserService.class);
+        UserService userService = context.getBean(UserService.class);
 
-      userService.add(new User("User1", "Lastname1", "user1@mail.ru"));
-      userService.add(new User("User2", "Lastname2", "user2@mail.ru"));
-      userService.add(new User("User3", "Lastname3", "user3@mail.ru"));
-      userService.add(new User("User4", "Lastname4", "user4@mail.ru"));
+        Car car1 = context.getBean(Car.class);
+        car1.setModel("Tahoe");
+        car1.setSeries(4);
+        User user1 = context.getBean(User.class);
+        user1.setCar(car1);
+        user1.setFirstName("Andrey");
+        user1.setLastName("Chistyakov");
+        user1.setEmail("mail@ya.ru");
 
-      List<User> users = userService.listUsers();
-      for (User user : users) {
-         System.out.println("Id = "+user.getId());
-         System.out.println("First Name = "+user.getFirstName());
-         System.out.println("Last Name = "+user.getLastName());
-         System.out.println("Email = "+user.getEmail());
-         System.out.println();
-      }
+        Car car2 = context.getBean(Car.class);
+        car2.setModel("RAV4");
+        car2.setSeries(3);
+        User user2 = context.getBean(User.class);
+        user2.setCar(car2);
+        user2.setFirstName("Sergio");
+        user2.setLastName("LastName");
+        user2.setEmail("pochta@ya.ru");
 
-      context.close();
-   }
+        Car car3 = context.getBean(Car.class);
+        car3.setModel("Amarok");
+        car3.setSeries(6);
+        User user3 = context.getBean(User.class);
+        user3.setCar(car3);
+        user3.setFirstName("Kate");
+        user3.setLastName("Bruster");
+        user3.setEmail("pochta@ya.ru");
+
+
+        userService.add(user1);
+        userService.add(user2);
+        userService.add(user3);
+
+
+        List<User> users = userService.listUsers();
+        for (User u : users) {
+            System.out.println("Id = " + u.getId());
+            System.out.println("First Name = " + u.getFirstName());
+            System.out.println("Last Name = " + u.getLastName());
+            System.out.println("Email = " + u.getEmail());
+            System.out.println("Car = " + u.getCar());
+            System.out.println();
+        }
+
+        String modelWanted = "Amarok";
+        int seriesWanted = 6;
+
+        List<User> usersByCarParams = userService.getUserByCarParams(modelWanted, seriesWanted);
+
+        System.out.println("\nUsers who have " + modelWanted + " " + seriesWanted + " series");
+        for (User user : usersByCarParams) {
+            System.out.println(user);
+        }
+
+
+        context.close();
+    }
 }
